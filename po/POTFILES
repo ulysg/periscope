@@ -1,0 +1,6 @@
+data/ch.ulys.Periscope.desktop.in
+data/ch.ulys.Periscope.metainfo.xml.in
+data/ch.ulys.Periscope.gschema.xml
+src/main.py
+src/window.py
+src/window.ui

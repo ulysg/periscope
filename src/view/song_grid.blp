@@ -1,0 +1,15 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SongGrid : Adw.Bin {
+  ScrolledWindow {
+    FlowBox grid {
+      orientation: horizontal;
+      row-spacing: 6;
+      column-spacing: 6;
+      homogeneous: true;
+      max-children-per-line: 6;
+      min-children-per-line: 2;
+    }
+  }
+}
