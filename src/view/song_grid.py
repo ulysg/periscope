@@ -16,9 +16,6 @@ class SongGrid(Adw.Bin):
         self.subsonic = SubsonicConfig()
         super().__init__(**kwargs)
 
-    def add_cover(self, cover):
-        grid.append(cover)
-
     async def show_playlist(self, id):
         try:
             playlist = await self.subsonic.get_playlist(id)
@@ -31,7 +28,8 @@ class SongGrid(Adw.Bin):
             self.grid.append(song_ui)
 
         try:
-            player.play_now(playlist.songs[0])
+            player.set_playlist(playlist.songs)
+            player.play()
 
         except Exception as e:
             print(e)

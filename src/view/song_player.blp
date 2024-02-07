@@ -1,0 +1,80 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $SongPlayer : ActionBar {
+  [start]
+  Box {
+    margin-start: 12;
+
+    Picture cover {
+      halign: center;
+      valign: center;
+      content-fit: contain;
+    }
+
+    Label title {
+      wrap: true;
+    }
+  }
+
+  [center]
+  Box {
+    hexpand: true;
+    halign: center;
+    valign: center;
+    orientation: vertical;
+
+    Box {
+      spacing: 6;
+
+      Button prev_button {
+        styles ["circular"]
+        valign: center;
+        icon-name: "media-skip-backward";
+        sensitive: false;
+        clicked => $_on_previous_clicked();
+      }
+
+      Button play_button {
+        styles ["pill", "suggested-action"]
+        valign: center;
+        clicked => $_on_toggle_play();
+
+        Image play_image {
+          icon-name: "media-playback-start";
+          icon-size: large;
+        }
+      }
+
+      Button next_button {
+        styles ["circular"]
+        valign: center;
+        icon-name: "media-skip-forward";
+        sensitive: false;
+        clicked => $_on_next_clicked();
+      }
+    }
+  }
+
+  [end]
+  Box {
+    hexpand: true;
+    halign: center;
+    margin-end: 12;
+    spacing: 6;
+
+    ToggleButton repeat_button {
+      styles ["circular"]
+      valign: center;
+      icon-name: "media-playlist-repeat";
+      clicked => $_on_toggle_loop();
+    }
+
+    ToggleButton shuffle_button {
+      styles ["circular"]
+      valign: center;
+      icon-name: "media-playlist-shuffle";
+      clicked => $_on_toggle_shuffle();
+    }
+  }
+}

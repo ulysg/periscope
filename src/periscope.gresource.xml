@@ -3,6 +3,7 @@
   <gresource prefix="/ch/ulys/Periscope">
     <file preprocess="xml-stripblanks">view/song_thumbnail.ui</file>
     <file preprocess="xml-stripblanks">view/song_grid.ui</file>
+    <file preprocess="xml-stripblanks">view/song_player.ui</file>
     <file preprocess="xml-stripblanks">view/window.ui</file>
   </gresource>
 </gresources>
