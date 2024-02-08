@@ -1,5 +1,6 @@
 using Gtk 4.0;
 using Adw 1;
+using Pango 1.0;
 
 template $SongPlayer : ActionBar {
   [start]
@@ -19,12 +20,10 @@ template $SongPlayer : ActionBar {
 
   [center]
   Box {
-    hexpand: true;
-    halign: center;
-    valign: center;
     orientation: vertical;
 
     Box {
+      halign: center;
       spacing: 6;
 
       Button prev_button {
@@ -54,12 +53,39 @@ template $SongPlayer : ActionBar {
         clicked => $_on_next_clicked();
       }
     }
+
+    Adw.Clamp {
+      maximum-size: 1000;
+
+      Box {
+        spacing: 6;
+
+        Label start_label {
+          label: "0:00";
+        }
+
+        Scale progress_scale {
+          orientation: horizontal;
+          hexpand: true;
+          valign: center;
+          value-changed => $_on_progress_changed();
+
+          adjustment: Adjustment {
+            lower: 0;
+            upper: 1000;
+            value: 0;
+          };
+        }
+
+        Label end_label {
+          label: "0:00";
+        }
+      }
+    }
   }
 
   [end]
   Box {
-    hexpand: true;
-    halign: center;
     margin-end: 12;
     spacing: 6;
 

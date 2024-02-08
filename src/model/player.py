@@ -41,7 +41,8 @@ class Player:
         if self._is_shuffling:
             random.shuffle(self._queue)
 
-        self._pop_and_play()
+        self._player.set_state(Gst.State.READY)
+        self._play_next()
 
     def play(self):
         self._player.set_state(Gst.State.PLAYING)
@@ -60,23 +61,18 @@ class Player:
         if not self._last_played:
             return
 
-        was_playing = self._is_playing
         self._player.set_state(Gst.State.READY)
 
         self._queue.insert(0, self._current_song)
-        self._current_song = self._last_played.pop(-1)
-
-        url = self._subsonic.get_stream_url(self._current_song.id)
-        self._player.set_property("uri", url)
+        self._queue.insert(0, self._last_played.pop(-1))
+        self._play_next()
 
         self._player.set_state(Gst.State.PLAYING)
 
     def next(self):
         self._player.set_state(Gst.State.READY)
-        self._pop_and_play()
-
-        if self._current_song:
-            self._player.set_state(Gst.State.PLAYING)
+        self._play_next()
+        self._player.set_state(Gst.State.PLAYING)
 
     def toggle_shuffle(self):
         if self._is_shuffling:
@@ -106,6 +102,13 @@ class Player:
     def is_looping(self):
         return self._is_looping
 
+    def seek(self, position):
+        self._player.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
+                                 position * Gst.SECOND)
+
+    def get_position(self):
+        return self._player.query_position(Gst.Format.TIME)[1] / Gst.SECOND
+
     def get_current_song(self):
         return self._current_song
 
@@ -118,7 +121,11 @@ class Player:
     def add_change_listener(self, listener: Callable[[bool], None]):
         self._change_listeners.append(listener)
 
-    def _pop_and_play(self):
+    def _play_next(self):
+        url = self._subsonic.get_stream_url(self._queue[0].id)
+        self._player.set_property("uri", url)
+
+    def _pop_queue(self):
         if not self._queue:
             if not self._is_looping:
                 self._current_song = None
@@ -134,25 +141,24 @@ class Player:
 
         self._current_song = self._queue.pop(0)
 
-        url = self._subsonic.get_stream_url(self._current_song.id)
-        self._player.set_property("uri", url)
+        if self._queue and self._last_played and self._last_played[-1] is self._queue[0]:
+            self._last_played.pop(-1)
 
     def _on_about_to_change(self, _):
-        self._pop_and_play()
-        [listener(self._is_playing) for listener in self._change_listeners]
+        self._play_next()
 
     def _on_message(self, bus, message):
         match message.type:
             case Gst.MessageType.STATE_CHANGED:
-                state = message.parse_state_changed()[1].value_name
-                self._is_playing = state == "GST_STATE_PLAYING"
+                old, new, _ = message.parse_state_changed()
+                self._is_playing = new == Gst.State.PLAYING
 
                 [listener(self._is_playing) for listener in self._change_listeners]
 
-            case Gst.MessageType.BUFFERING:
-                pass
+            case Gst.MessageType.STREAM_START:
+                self._is_playing = True
+                self._pop_queue()
 
-            case Gst.MessageType.EOS:
-                pass
+                [listener(self._is_playing) for listener in self._change_listeners]
 
 player = Player()

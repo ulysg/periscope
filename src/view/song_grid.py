@@ -1,6 +1,8 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 
+import time
+
 from .subsonic import SubsonicConfig
 from .song_thumbnail import SongThumbnail
 from .errors import SonicError

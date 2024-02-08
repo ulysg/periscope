@@ -2,17 +2,17 @@ using Gtk 4.0;
 using Adw 1;
 
 template $Window : Adw.ApplicationWindow {
-  default-width: 600;
-  default-height: 300;
+  default-width: 1000;
+  default-height: 500;
   title: _("Periscope");
 
   Box {
-  $SongGrid song_grid {
-  }
-  }
+    orientation: vertical;
 
-  Box {
-  $SongPlayer song_player {
-  }
+    $SongGrid song_grid {
+    }
+
+    $SongPlayer song_player {
+    }
   }
 }
