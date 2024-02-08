@@ -21,6 +21,7 @@ class Player:
         self._is_playing = False
 
         self._change_listeners = []
+        self._seek_callback = None
 
         Gst.init(None)
         self._player = Gst.ElementFactory.make("playbin3", "player")
@@ -102,9 +103,11 @@ class Player:
     def is_looping(self):
         return self._is_looping
 
-    def seek(self, position):
+    def seek(self, position, finished_callback: Callable):
         self._player.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
                                  position * Gst.SECOND)
+
+        self._seek_callback = finished_callback
 
     def get_position(self):
         return self._player.query_position(Gst.Format.TIME)[1] / Gst.SECOND
@@ -160,5 +163,10 @@ class Player:
                 self._pop_queue()
 
                 [listener(self._is_playing) for listener in self._change_listeners]
+
+            case Gst.MessageType.ASYNC_DONE:
+                if self._seek_callback:
+                    self._seek_callback()
+                    self._seek_callback = None
 
 player = Player()

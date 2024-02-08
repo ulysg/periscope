@@ -6,8 +6,6 @@ import time
 
 from .player import player
 
-SEEK_TIMEOUT = 0.1
-
 @Gtk.Template(resource_path = "/ch/ulys/Periscope/view/song_player.ui")
 class SongPlayer(Gtk.ActionBar):
     __gtype_name__ = "SongPlayer"
@@ -23,8 +21,7 @@ class SongPlayer(Gtk.ActionBar):
     start_label = Gtk.Template.Child()
     end_label = Gtk.Template.Child()
 
-    _last_scale_value = -1
-    _last_seek = 0
+    _is_scale_pressed = False
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -38,19 +35,29 @@ class SongPlayer(Gtk.ActionBar):
         self.start_label.set_attributes(attributes)
         self.end_label.set_attributes(attributes)
 
-    def _update_scale(self):
-        song = player.get_current_song()
-        position = player.get_position()
+        start_ctrl = Gtk.GestureClick()
+        start_ctrl.connect("pressed", self._on_scale_pressed)
 
-        if not song or position < 0:
+        end_ctrl = Gtk.GestureClick()
+        end_ctrl.connect("unpaired-release", self._on_scale_released)
+        end_ctrl.set_touch_only(True)
+
+        self.progress_scale.add_controller(start_ctrl)
+        self.progress_scale.add_controller(end_ctrl)
+
+    def _update_scale(self):
+        if self._is_scale_pressed:
             return
 
-        progress = self.progress_scale.get_adjustment().get_upper() * position / song.duration
-        self._last_scale_value = progress
-        self.progress_scale.set_value(progress)
+        position = player.get_position()
+
+        if position < 0:
+            return
+
+        self._progress = position
+        self.progress_scale.set_value(self._progress)
 
         self.start_label.set_text(self._time_to_str(position))
-        self.end_label.set_text(self._time_to_str(song.duration))
 
     def _time_to_str(self, seconds):
         return time.strftime("%-M:%S", time.gmtime(seconds))
@@ -59,11 +66,8 @@ class SongPlayer(Gtk.ActionBar):
         self._timeout = GLib.timeout_add(100, self._on_time_out)
         self._update_scale()
 
-    def _update_thumbnail(self):
-        if not player.get_current_song():
-            return
-
-        self.title.set_text(player.get_current_song().title)
+    def _update_thumbnail(self, song):
+        self.title.set_text(song.title)
 
     def _on_state_change(self, is_playing):
         if is_playing:
@@ -75,24 +79,30 @@ class SongPlayer(Gtk.ActionBar):
         self.prev_button.set_sensitive(bool(player.get_last_played()))
         self.next_button.set_sensitive(bool(player.get_queue()) or player.is_looping())
 
-        self._update_thumbnail()
+        song = player.get_current_song()
         self._update_scale()
 
-    def _seek(self, progress_value):
+        if song:
+            self._update_thumbnail(song)
+            self.end_label.set_text(self._time_to_str(song.duration))
+            self.progress_scale.get_adjustment().set_upper(round(song.duration, 1))
+
+    def _seek(self):
         song = player.get_current_song()
 
         if not song:
             return
 
-        now = time.monotonic()
+        player.seek(self.progress_scale.get_value(), self._on_seek_finished)
 
-        if now - self._last_seek < SEEK_TIMEOUT:
-            return
+    def _on_scale_pressed(self, *args):
+        self._is_scale_pressed = True
 
-        self._last_seek = now
+    def _on_scale_released(self, *args):
+        self._seek()
 
-        position = progress_value / self.progress_scale.get_adjustment().get_upper()
-        player.seek(position * song.duration)
+    def _on_seek_finished(self):
+        self._is_scale_pressed = False
 
     @Gtk.Template.Callback()
     def _on_toggle_play(self, button):
@@ -118,5 +128,7 @@ class SongPlayer(Gtk.ActionBar):
 
     @Gtk.Template.Callback()
     def _on_progress_changed(self, scale):
-        if self._last_scale_value != scale.get_value():
-            self._seek(scale.get_value())
+        if not self._is_scale_pressed:
+            return
+
+        self.start_label.set_text(self._time_to_str(scale.get_value()))
