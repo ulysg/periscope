@@ -87,16 +87,16 @@
             ]
         },
         {
-            "name": "python3-pydub",
+            "name": "python3-xdg-base-dirs",
             "buildsystem": "simple",
             "build-commands": [
-                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pydub\" --no-build-isolation"
+                "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"xdg-base-dirs\" --no-build-isolation"
             ],
             "sources": [
                 {
                     "type": "file",
-                    "url": "https://files.pythonhosted.org/packages/a6/53/d78dc063216e62fc55f6b2eebb447f6a4b0a59f55c8406376f76bf959b08/pydub-0.25.1-py2.py3-none-any.whl",
-                    "sha256": "65617e33033874b59d87db603aa1ed450633288aefead953b30bded59cb599a6"
+                    "url": "https://files.pythonhosted.org/packages/94/e0/8c5ae4c8fc31492de9db4c6013f28811c0ad3fbfad57b4220fe75a312243/xdg_base_dirs-6.0.1-py3-none-any.whl",
+                    "sha256": "63f6ebc1721ced2e86c340856e004ef829501a30a37e17079c52cfaf0e1741b9"
                 }
             ]
         }

@@ -1,24 +1,29 @@
 import configparser
+import os
+import xdg_base_dirs
 
-CONFIG_LOCATION = "config.ini"
+CONFIG_NAME = "config.ini"
 
 class Config:
     def __init__(self):
-        self.config = configparser.ConfigParser()
-        self.config.read(CONFIG_LOCATION)
+        self._config = configparser.ConfigParser()
+        self._config.read(self._get_config_path())
 
     def get(self, section: str, key: str) -> str:
-        return self.config[section][key]
+        return self._config[section][key]
 
     def set(self, section: str, key: str, value: str):
         try:
-            self.config[section][key] = value
+            self._config[section][key] = value
 
         except KeyError:
-            self.config[section] = {}
-            self.config[section][key] = value
+            self._config[section] = {}
+            self._config[section][key] = value
 
-        with open(CONFIG_LOCATION, "w") as configfile:
-            self.config.write(configfile)
+        with open(self._get_config_path(), "w") as configfile:
+            self._config.write(configfile)
+
+    def _get_config_path(self):
+        return os.path.join(xdg_base_dirs.xdg_config_home(), CONFIG_NAME)
 
 config = Config()

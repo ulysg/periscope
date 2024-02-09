@@ -20,7 +20,8 @@ class Player:
         self._is_looping = False
         self._is_playing = False
 
-        self._change_listeners = []
+        self._state_listeners = []
+        self._song_listeners = []
         self._seek_callback = None
 
         Gst.init(None)
@@ -105,7 +106,7 @@ class Player:
 
     def seek(self, position, finished_callback: Callable):
         self._player.seek_simple(Gst.Format.TIME, Gst.SeekFlags.FLUSH | Gst.SeekFlags.KEY_UNIT,
-                                 position * Gst.SECOND)
+                position * Gst.SECOND)
 
         self._seek_callback = finished_callback
 
@@ -121,8 +122,11 @@ class Player:
     def get_last_played(self):
         return self._last_played.copy()
 
-    def add_change_listener(self, listener: Callable[[bool], None]):
-        self._change_listeners.append(listener)
+    def add_state_listener(self, listener: Callable[[bool], None]):
+        self._state_listeners.append(listener)
+
+    def add_song_listener(self, listener: Callable[[Song], None]):
+        self._song_listeners.append(listener)
 
     def _play_next(self):
         url = self._subsonic.get_stream_url(self._queue[0].id)
@@ -156,13 +160,13 @@ class Player:
                 old, new, _ = message.parse_state_changed()
                 self._is_playing = new == Gst.State.PLAYING
 
-                [listener(self._is_playing) for listener in self._change_listeners]
+                [listener(self._is_playing) for listener in self._state_listeners]
 
             case Gst.MessageType.STREAM_START:
                 self._is_playing = True
                 self._pop_queue()
 
-                [listener(self._is_playing) for listener in self._change_listeners]
+                [listener(self._current_song) for listener in self._song_listeners]
 
             case Gst.MessageType.ASYNC_DONE:
                 if self._seek_callback:

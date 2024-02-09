@@ -35,6 +35,15 @@ class Subsonic:
         params["id"] = id
         return url + urllib.parse.urlencode(params)
 
+    async def get_cover(self, id: str) -> Generator[bytes, None, None]:
+        return self._request_bin("getCoverArt", {"id": id})
+
+    def get_cover_url(self, id: str) -> str:
+        url = f"{self.base_url}/rest/getCoverArt?"
+        params = self._get_params()
+        params["id"] = id
+        return url + urllib.parse.urlencode(params)
+
     async def _request_json(self, endpoint: str, query: dict = {}) -> dict:
         url = f"{self.base_url}/rest/{endpoint}"
         data = self._get_params()
@@ -52,7 +61,7 @@ class Subsonic:
 
                 return result
 
-    async def _request_bin(self, endpoint: str, query: dict = {}):
+    async def _request_bin(self, endpoint: str, query: dict = {}) -> Generator[bytes, None, None]:
         url = f"{self.base_url}/rest/{endpoint}"
         data = self._get_params()
         data.update(query)

@@ -2,9 +2,15 @@ from gi.repository import Adw
 from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import Pango
-import time
+from gi.repository import GdkPixbuf
 
+import time
+import io
+
+from .subsonic import SubsonicConfig
+from .cover_cache import CoverCache
 from .player import player
+from .async_loop import loop
 
 @Gtk.Template(resource_path = "/ch/ulys/Periscope/view/song_player.ui")
 class SongPlayer(Gtk.ActionBar):
@@ -12,6 +18,7 @@ class SongPlayer(Gtk.ActionBar):
 
     cover = Gtk.Template.Child()
     title = Gtk.Template.Child()
+    artist = Gtk.Template.Child()
 
     play_image = Gtk.Template.Child()
     prev_button = Gtk.Template.Child()
@@ -25,8 +32,8 @@ class SongPlayer(Gtk.ActionBar):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        player.add_change_listener(self._on_state_change)
-        self._on_time_out()
+        self._subsonic = SubsonicConfig()
+        self._cover_cache = CoverCache()
 
         attribute = Pango.AttrFontFeatures.new("tnum=1")
         attributes = Pango.AttrList()
@@ -34,6 +41,12 @@ class SongPlayer(Gtk.ActionBar):
 
         self.start_label.set_attributes(attributes)
         self.end_label.set_attributes(attributes)
+
+        attribute = Pango.AttrFontDesc.new(Pango.FontDescription.from_string("Bold"))
+        attributes = Pango.AttrList()
+        attributes.insert(attribute)
+
+        self.title.set_attributes(attributes)
 
         start_ctrl = Gtk.GestureClick()
         start_ctrl.connect("pressed", self._on_scale_pressed)
@@ -44,6 +57,10 @@ class SongPlayer(Gtk.ActionBar):
 
         self.progress_scale.add_controller(start_ctrl)
         self.progress_scale.add_controller(end_ctrl)
+
+        player.add_state_listener(self._on_state_change)
+        player.add_song_listener(self._on_song_change)
+        self._on_time_out()
 
     def _update_scale(self):
         if self._is_scale_pressed:
@@ -66,8 +83,28 @@ class SongPlayer(Gtk.ActionBar):
         self._timeout = GLib.timeout_add(100, self._on_time_out)
         self._update_scale()
 
-    def _update_thumbnail(self, song):
+    async def _update_thumbnail(self, song):
         self.title.set_text(song.title)
+        self.artist.set_text(song.artist)
+
+        try:
+            cover_location = await self._cover_cache.get_file_location(song.coverArt)
+            self.cover.set_from_file(cover_location)
+
+        except Exception as e:
+            print(e)
+
+    def _on_song_change(self, new_song):
+        self.prev_button.set_sensitive(bool(player.get_last_played()))
+        self.next_button.set_sensitive(bool(player.get_queue()) or player.is_looping())
+
+        self._update_scale()
+
+        if new_song:
+            self.end_label.set_text(self._time_to_str(new_song.duration))
+            self.progress_scale.get_adjustment().set_upper(new_song.duration)
+
+            loop.submit_async(self._update_thumbnail(new_song))
 
     def _on_state_change(self, is_playing):
         if is_playing:
@@ -75,17 +112,6 @@ class SongPlayer(Gtk.ActionBar):
 
         else:
             self.play_image.set_from_icon_name("media-playback-start")
-
-        self.prev_button.set_sensitive(bool(player.get_last_played()))
-        self.next_button.set_sensitive(bool(player.get_queue()) or player.is_looping())
-
-        song = player.get_current_song()
-        self._update_scale()
-
-        if song:
-            self._update_thumbnail(song)
-            self.end_label.set_text(self._time_to_str(song.duration))
-            self.progress_scale.get_adjustment().set_upper(round(song.duration, 1))
 
     def _seek(self):
         song = player.get_current_song()

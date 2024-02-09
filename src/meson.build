@@ -48,6 +48,7 @@ periscope_sources = [
   'model/config.py',
   'model/async_loop.py',
   'model/player.py',
+  'model/cover_cache.py',
   'model/api/subsonic.py',
   'model/api/errors.py',
   'model/api/medias.py'

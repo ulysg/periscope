@@ -7,6 +7,7 @@ gi.require_version("Gst", "1.0")
 
 from gi.repository import Gtk, Gio, Adw
 from .window import Window
+from .config import config
 
 class PeriscopeApplication(Adw.Application):
     def __init__(self):
