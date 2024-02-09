@@ -7,6 +7,7 @@ from gi.repository import GdkPixbuf
 import time
 import io
 
+from .cover_image import CoverImage
 from .subsonic import SubsonicConfig
 from .cover_cache import CoverCache
 from .player import player
@@ -62,6 +63,9 @@ class SongPlayer(Gtk.ActionBar):
         player.add_song_listener(self._on_song_change)
         self._on_time_out()
 
+        self._cover_image = CoverImage(12)
+        self.cover.set_from_paintable(self._cover_image)
+
     def _update_scale(self):
         if self._is_scale_pressed:
             return
@@ -83,16 +87,15 @@ class SongPlayer(Gtk.ActionBar):
         self._timeout = GLib.timeout_add(100, self._on_time_out)
         self._update_scale()
 
-    async def _update_thumbnail(self, song):
+    async def _update_cover(self, song):
+        cover_location = await self._cover_cache.get_file_location(song.coverArt)
+        GLib.idle_add(self._cover_image.set_cover, cover_location)
+
+    def _update_thumbnail(self, song):
         self.title.set_text(song.title)
         self.artist.set_text(song.artist)
 
-        try:
-            cover_location = await self._cover_cache.get_file_location(song.coverArt)
-            self.cover.set_from_file(cover_location)
-
-        except Exception as e:
-            print(e)
+        loop.submit_async(self._update_cover(song))
 
     def _on_song_change(self, new_song):
         self.prev_button.set_sensitive(bool(player.get_last_played()))
@@ -103,8 +106,7 @@ class SongPlayer(Gtk.ActionBar):
         if new_song:
             self.end_label.set_text(self._time_to_str(new_song.duration))
             self.progress_scale.get_adjustment().set_upper(new_song.duration)
-
-            loop.submit_async(self._update_thumbnail(new_song))
+            self._update_thumbnail(new_song)
 
     def _on_state_change(self, is_playing):
         if is_playing:

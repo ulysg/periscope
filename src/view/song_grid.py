@@ -15,8 +15,8 @@ class SongGrid(Adw.Bin):
     grid = Gtk.Template.Child()
 
     def __init__(self, **kwargs):
-        self.subsonic = SubsonicConfig()
         super().__init__(**kwargs)
+        self.subsonic = SubsonicConfig()
 
     async def show_playlist(self, id):
         try:

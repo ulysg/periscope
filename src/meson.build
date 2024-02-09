@@ -45,6 +45,7 @@ periscope_sources = [
   'view/song_grid.py',
   'view/song_thumbnail.py',
   'view/song_player.py',
+  'view/cover_image.py',
   'model/config.py',
   'model/async_loop.py',
   'model/player.py',
