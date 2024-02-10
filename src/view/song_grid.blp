@@ -5,13 +5,21 @@ template $SongGrid : Adw.Bin {
   ScrolledWindow {
     propagate-natural-height: true;
 
-    FlowBox grid {
-      orientation: horizontal;
-      row-spacing: 24;
-      column-spacing: 24;
-      homogeneous: true;
-      max-children-per-line: 6;
-      min-children-per-line: 2;
+    Adw.Clamp {
+      maximum-size: 1000;
+
+      FlowBox grid {
+        margin-top: 24;
+        margin-bottom: 24;
+        margin-start: 24;
+        margin-end: 24;
+        orientation: horizontal;
+        row-spacing: 48;
+        column-spacing: 48;
+        homogeneous: true;
+        max-children-per-line: 6;
+        min-children-per-line: 2;
+      }
     }
   }
 }

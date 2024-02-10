@@ -2,128 +2,171 @@ using Gtk 4.0;
 using Adw 1;
 using Pango 1.0;
 
-template $SongPlayer : ActionBar {
-  [start]
-  Box {
-    margin-start: 12;
-    margin-end: 12;
-    margin-top: 6;
-    margin-bottom: 6;
-    spacing: 12;
+template $SongPlayer : Adw.Bin {
+  margin-top: 24;
+  margin-bottom: 24;
+  margin-start: 24;
+  margin-end: 24;
 
-    Image cover {
-      pixel-size: 96;
-    }
+  Adw.BreakpointBin breakpoint_bin {
+    width-request: 304;
+    height-request: 96;
 
-    Box {
-      orientation: vertical;
-      valign: center;
-      spacing: 6;
+    Adw.Breakpoint {
+        condition ("min-width: 600sp")
 
-      Label title {
-        halign: start;
-        ellipsize: end;
-        max-width-chars: 20;
+        setters {
+          scale_bellow_bin.child: scale_clamp;
+          thumbnail_beside_bin.child: thumbnail;
+        }
       }
 
-      Label artist {
-        halign: start;
-        ellipsize: end;
-        max-width-chars: 20;
+      Adw.Breakpoint {
+        condition ("max-width: 600sp")
+
+        setters {
+          breakpoint_bin.height-request: 206;
+          vertical_box.spacing: 12;
+          scale_above_bin.child: scale_clamp;
+          thumbnail_above_bin.child: thumbnail;
+        }
+      }
+
+    Box vertical_box {
+      orientation: vertical;
+      spacing: 0;
+
+      Adw.Bin thumbnail_above_bin {
+      }
+
+      Adw.Bin scale_above_bin {
+      }
+
+      CenterBox {
+        hexpand: true;
+
+        [start]
+        Adw.Bin thumbnail_beside_bin {
+        }
+
+        [center]
+        Box {
+          orientation: vertical;
+          hexpand: true;
+
+          Box {
+            halign: center;
+            vexpand: true;
+            spacing: 6;
+            margin-start: 24;
+            margin-end: 24;
+
+            Button prev_button {
+              styles ["circular"]
+              valign: center;
+              icon-name: "media-skip-backward-symbolic";
+              sensitive: false;
+              clicked => $_on_previous_clicked();
+            }
+
+            Button play_button {
+              styles ["pill", "suggested-action"]
+              valign: center;
+              clicked => $_on_toggle_play();
+
+              Image play_image {
+                icon-name: "media-playback-start-symbolic";
+                icon-size: large;
+              }
+            }
+
+            Button next_button {
+              styles ["circular"]
+              valign: center;
+              icon-name: "media-skip-forward-symbolic";
+              sensitive: false;
+              clicked => $_on_next_clicked();
+            }
+          }
+
+          Adw.Bin scale_bellow_bin {
+          }
+        }
+
+        [end]
+        Box {
+          spacing: 12;
+          vexpand: true;
+
+          ToggleButton repeat_button {
+            styles ["circular"]
+            valign: center;
+            icon-name: "media-playlist-repeat-symbolic";
+            clicked => $_on_toggle_loop();
+          }
+
+          ToggleButton shuffle_button {
+            styles ["circular"]
+            valign: center;
+            icon-name: "media-playlist-shuffle-symbolic";
+            clicked => $_on_toggle_shuffle();
+          }
+        }
       }
     }
   }
+}
 
-  [center]
+Adw.Clamp scale_clamp {
+  maximum-size: 1000;
+
+  Box {
+    Label start_label {
+      label: "0:00";
+    }
+
+    Scale progress_scale {
+      orientation: horizontal;
+      hexpand: true;
+      valign: center;
+      value-changed => $_on_progress_changed();
+
+      adjustment: Adjustment {
+        lower: 0;
+        upper: 10;
+        value: 0;
+      };
+    }
+
+    Label end_label {
+      label: "0:00";
+    }
+  }
+}
+
+Box thumbnail {
+  vexpand: true;
+  spacing: 12;
+
+
+  Image cover {
+    pixel-size: 96;
+  }
+
   Box {
     orientation: vertical;
-    margin-start: 12;
-    margin-end: 12;
-    margin-top: 6;
-    margin-bottom: 6;
-    spacing: 6;
-    hexpand: true;
+    valign: center;
 
-    Box {
-      halign: center;
-      spacing: 6;
-
-      Button prev_button {
-        styles ["circular"]
-        valign: center;
-        icon-name: "media-skip-backward-symbolic";
-        sensitive: false;
-        clicked => $_on_previous_clicked();
-      }
-
-      Button play_button {
-        styles ["pill", "suggested-action"]
-        valign: center;
-        clicked => $_on_toggle_play();
-
-        Image play_image {
-          icon-name: "media-playback-start-symbolic";
-          icon-size: large;
-        }
-      }
-
-      Button next_button {
-        styles ["circular"]
-        valign: center;
-        icon-name: "media-skip-forward-symbolic";
-        sensitive: false;
-        clicked => $_on_next_clicked();
-      }
+    Label title {
+      halign: start;
+      ellipsize: end;
+      max-width-chars: 20;
     }
 
-    Adw.Clamp {
-      maximum-size: 1000;
-
-      Box {
-        spacing: 6;
-
-        Label start_label {
-          label: "0:00";
-        }
-
-        Scale progress_scale {
-          orientation: horizontal;
-          hexpand: true;
-          valign: center;
-          value-changed => $_on_progress_changed();
-
-          adjustment: Adjustment {
-            lower: 0;
-            upper: 10;
-            value: 0;
-          };
-        }
-
-        Label end_label {
-          label: "0:00";
-        }
-      }
-    }
-  }
-
-  [end]
-  Box {
-    margin-start: 12;
-    margin-end: 24;
-    spacing: 6;
-
-    ToggleButton repeat_button {
-      styles ["circular"]
-      valign: center;
-      icon-name: "media-playlist-repeat-symbolic";
-      clicked => $_on_toggle_loop();
-    }
-
-    ToggleButton shuffle_button {
-      styles ["circular"]
-      valign: center;
-      icon-name: "media-playlist-shuffle-symbolic";
-      clicked => $_on_toggle_shuffle();
+    Label artist {
+      halign: start;
+      ellipsize: end;
+      max-width-chars: 20;
     }
   }
 }

@@ -14,7 +14,7 @@ from .player import player
 from .async_loop import loop
 
 @Gtk.Template(resource_path = "/ch/ulys/Periscope/view/song_player.ui")
-class SongPlayer(Gtk.ActionBar):
+class SongPlayer(Adw.Bin):
     __gtype_name__ = "SongPlayer"
 
     cover = Gtk.Template.Child()

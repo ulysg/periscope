@@ -1,6 +1,7 @@
 from gi.repository import Adw
 from gi.repository import Gtk
 from gi.repository import GLib
+from gi.repository import Pango
 
 from .cover_cache import CoverCache
 from .async_loop import loop
@@ -23,6 +24,12 @@ class CoverThumbnail(Adw.Bin):
         self._cover_image = CoverImage(12, self)
         self.cover.set_from_paintable(self._cover_image)
 
+        attribute = Pango.AttrFontDesc.new(Pango.FontDescription.from_string("Bold"))
+        attributes = Pango.AttrList()
+        attributes.insert(attribute)
+
+        self.title.set_attributes(attributes)
+
         match self._media:
             case Song():
                 self.title.set_text(self._media.title)
@@ -34,6 +41,7 @@ class CoverThumbnail(Adw.Bin):
 
     async def _set_cover(self):
         try:
+            GLib.idle_add(self._cover_image.unset_cover)
             cover_location = await self._cover_cache.get_file_location(self._media.coverArt)
             GLib.idle_add(self._cover_image.set_cover, cover_location)
 

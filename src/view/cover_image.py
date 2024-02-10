@@ -53,6 +53,10 @@ class CoverImage(GObject.GObject, Gdk.Paintable):
         self._texture = Gdk.Texture.new_from_filename(filename)
         self.invalidate_contents()
 
+    def unset_cover(self):
+        self._texture = None
+        self.invalidate_contents()
+
     def _on_dark_changed(self, *args):
         if self._texture:
             return

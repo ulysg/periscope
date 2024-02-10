@@ -6,13 +6,23 @@ template $Window : Adw.ApplicationWindow {
   default-height: 500;
   title: _("Periscope");
 
-  Box {
-    orientation: vertical;
-    valign: end;
+  Adw.ToolbarView{
+    top-bar-style: raised;
+    bottom-bar-style: raised;
 
-    $SongGrid song_grid {
+    [top]
+    Adw.HeaderBar header_bar {
     }
 
+    content: Box {
+      orientation: vertical;
+      valign: end;
+
+      $SongGrid song_grid {
+      }
+    };
+
+    [bottom]
     $SongPlayer song_player {
     }
   }

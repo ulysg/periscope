@@ -15,3 +15,4 @@ class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         loop.submit_async(self.song_grid.show_playlist("bb052612-f834-4ff2-9937-e01351941b3d"))
+
