@@ -4,7 +4,7 @@ gnome = import('gnome')
 
 blueprints = custom_target('blueprints',
   input: files(
-    'view/song_thumbnail.blp',
+    'view/cover_thumbnail.blp',
     'view/song_grid.blp',
     'view/window.blp',
     'view/song_player.blp'
@@ -43,7 +43,7 @@ periscope_sources = [
   'main.py',
   'view/window.py',
   'view/song_grid.py',
-  'view/song_thumbnail.py',
+  'view/cover_thumbnail.py',
   'view/song_player.py',
   'view/cover_image.py',
   'model/config.py',

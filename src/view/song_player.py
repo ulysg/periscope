@@ -63,7 +63,7 @@ class SongPlayer(Gtk.ActionBar):
         player.add_song_listener(self._on_song_change)
         self._on_time_out()
 
-        self._cover_image = CoverImage(12)
+        self._cover_image = CoverImage(12, self)
         self.cover.set_from_paintable(self._cover_image)
 
     def _update_scale(self):
@@ -97,10 +97,12 @@ class SongPlayer(Gtk.ActionBar):
 
         loop.submit_async(self._update_cover(song))
 
-    def _on_song_change(self, new_song):
+    def _update_prev_next(self):
         self.prev_button.set_sensitive(bool(player.get_last_played()))
         self.next_button.set_sensitive(bool(player.get_queue()) or player.is_looping())
 
+    def _on_song_change(self, new_song):
+        self._update_prev_next()
         self._update_scale()
 
         if new_song:
@@ -139,12 +141,12 @@ class SongPlayer(Gtk.ActionBar):
     @Gtk.Template.Callback()
     def _on_toggle_shuffle(self, button):
         player.toggle_shuffle()
-        self._on_state_change(player.is_playing())
+        self._update_prev_next()
 
     @Gtk.Template.Callback()
     def _on_toggle_loop(self, button):
         player.toggle_loop()
-        self._on_state_change(player.is_playing())
+        self._update_prev_next()
 
     @Gtk.Template.Callback()
     def _on_previous_clicked(self, button):
@@ -160,3 +162,4 @@ class SongPlayer(Gtk.ActionBar):
             return
 
         self.start_label.set_text(self._time_to_str(scale.get_value()))
+

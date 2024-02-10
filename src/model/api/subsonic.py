@@ -20,7 +20,7 @@ class Subsonic:
 
     async def get_playlists(self) -> list[Playlist]:
         result = await self._request_json("getPlaylists")
-        return [Playlist(playlist) for playlist in result["playlists"]]
+        return [Playlist(playlist) for playlist in result["playlists"]["playlist"]]
 
     async def get_playlist(self, id: str) -> Playlist:
         result = await self._request_json("getPlaylist", {"id": id})

@@ -6,10 +6,13 @@ template $SongPlayer : ActionBar {
   [start]
   Box {
     margin-start: 12;
+    margin-end: 12;
+    margin-top: 6;
+    margin-bottom: 6;
     spacing: 12;
 
     Image cover {
-      pixel-size: 84;
+      pixel-size: 96;
     }
 
     Box {
@@ -39,6 +42,7 @@ template $SongPlayer : ActionBar {
     margin-top: 6;
     margin-bottom: 6;
     spacing: 6;
+    hexpand: true;
 
     Box {
       halign: center;
@@ -47,7 +51,7 @@ template $SongPlayer : ActionBar {
       Button prev_button {
         styles ["circular"]
         valign: center;
-        icon-name: "media-skip-backward";
+        icon-name: "media-skip-backward-symbolic";
         sensitive: false;
         clicked => $_on_previous_clicked();
       }
@@ -58,7 +62,7 @@ template $SongPlayer : ActionBar {
         clicked => $_on_toggle_play();
 
         Image play_image {
-          icon-name: "media-playback-start";
+          icon-name: "media-playback-start-symbolic";
           icon-size: large;
         }
       }
@@ -66,7 +70,7 @@ template $SongPlayer : ActionBar {
       Button next_button {
         styles ["circular"]
         valign: center;
-        icon-name: "media-skip-forward";
+        icon-name: "media-skip-forward-symbolic";
         sensitive: false;
         clicked => $_on_next_clicked();
       }
@@ -104,20 +108,21 @@ template $SongPlayer : ActionBar {
 
   [end]
   Box {
-    margin-end: 12;
+    margin-start: 12;
+    margin-end: 24;
     spacing: 6;
 
     ToggleButton repeat_button {
       styles ["circular"]
       valign: center;
-      icon-name: "media-playlist-repeat";
+      icon-name: "media-playlist-repeat-symbolic";
       clicked => $_on_toggle_loop();
     }
 
     ToggleButton shuffle_button {
       styles ["circular"]
       valign: center;
-      icon-name: "media-playlist-shuffle";
+      icon-name: "media-playlist-shuffle-symbolic";
       clicked => $_on_toggle_shuffle();
     }
   }

@@ -1,5 +1,7 @@
 import xdg_base_dirs
 import os
+import PIL
+import PIL.Image
 
 from .subsonic import SubsonicConfig
 
@@ -18,7 +20,12 @@ class CoverCache:
         filepath = self._get_file_path(id)
 
         if os.path.isfile(filepath):
-            return filepath
+            try:
+                PIL.Image.open(filepath)
+                return filepath
+
+            except PIL.UnidentifiedImageError:
+                pass
 
         return await self._fetch_and_save(id)
 

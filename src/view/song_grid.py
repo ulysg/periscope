@@ -1,10 +1,11 @@
 from gi.repository import Adw
 from gi.repository import Gtk
+from gi.repository import GLib
 
 import time
 
 from .subsonic import SubsonicConfig
-from .song_thumbnail import SongThumbnail
+from .cover_thumbnail import CoverThumbnail
 from .errors import SonicError
 from .player import player
 
@@ -19,21 +20,21 @@ class SongGrid(Adw.Bin):
         self.subsonic = SubsonicConfig()
 
     async def show_playlist(self, id):
-        try:
-            playlist = await self.subsonic.get_playlist(id)
+        playlist = await self.subsonic.get_playlist(id)
+        player.set_playlist(playlist.songs)
+        player.play()
 
-        except Execption as e:
-            print(e)
-
-        for song in playlist.songs:
-            song_ui = SongThumbnail(song)
-            self.grid.append(song_ui)
+        playlists = await self.subsonic.get_playlists()
 
         try:
-            player.set_playlist(playlist.songs)
-            player.play()
+            for playlist in playlists:
+                GLib.idle_add(self._add_song, playlist)
 
         except Exception as e:
             print(e)
+
+    def _add_song(self, song):
+        song_ui = CoverThumbnail(song)
+        GLib.idle_add(self.grid.append, song_ui)
 
 

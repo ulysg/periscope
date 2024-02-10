@@ -1,0 +1,17 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $CoverThumbnail : Adw.Bin {
+  Box {
+    orientation: vertical;
+
+    Image cover {
+      pixel-size: 144;
+    }
+
+    Label title {
+      ellipsize: end;
+      max-width-chars: 20;
+    }
+  }
+}

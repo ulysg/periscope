@@ -95,6 +95,12 @@ class Player:
     def toggle_loop(self):
         self._is_looping = not self._is_looping
 
+        if self._is_looping and not self._queue:
+            self._queue = self._playlist.copy()
+
+            if self._is_shuffling:
+                random.shuffle(self._queue)
+
     def is_playing(self):
         return self._is_playing
 
