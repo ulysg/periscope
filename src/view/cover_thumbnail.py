@@ -14,6 +14,7 @@ class CoverThumbnail(Adw.Bin):
 
     cover = Gtk.Template.Child()
     title = Gtk.Template.Child()
+    artist = Gtk.Template.Child()
 
     def __init__(self, media, **kwargs):
         super().__init__(**kwargs)
@@ -33,9 +34,14 @@ class CoverThumbnail(Adw.Bin):
         match self._media:
             case Song():
                 self.title.set_text(self._media.title)
+                self.artist.set_text(self._media.artist)
 
             case Playlist():
                 self.title.set_text(self._media.name)
+
+            case Album():
+                self.title.set_text(self._media.title)
+                self.artist.set_text(self._media.artist)
 
         loop.submit_async(self._set_cover())
 

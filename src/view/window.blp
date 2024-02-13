@@ -6,21 +6,39 @@ template $Window : Adw.ApplicationWindow {
   default-height: 500;
   title: _("Periscope");
 
+  close-request => _on_window_close();
+
   Adw.ToolbarView{
     top-bar-style: raised;
     bottom-bar-style: raised;
 
     [top]
-    Adw.HeaderBar header_bar {
+    Adw.HeaderBar {
+      title-widget: Adw.ViewSwitcher {
+        policy: wide;
+        stack: stack;
+      };
     }
 
-    content: Box {
-      orientation: vertical;
-      valign: end;
+    Adw.ViewStack stack {
+      Adw.ViewStackPage album_page {
+        name: "albums";
+        title: _("Albums");
+        icon-name: "folder-music-symbolic";
 
-      $SongGrid song_grid {
+        child: $AlbumView album_view {
+        };
       }
-    };
+
+      Adw.ViewStackPage playlist_page {
+        name: "playlists";
+        title: _("Playlists");
+        icon-name: "folder-music-symbolic";
+
+        child: $SongGrid song_grid {
+        };
+      }
+    }
 
     [bottom]
     $SongPlayer song_player {

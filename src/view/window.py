@@ -2,6 +2,7 @@ from gi.repository import Adw
 from gi.repository import Gtk
 
 from .song_grid import SongGrid
+from .album_view import AlbumView
 from .song_player import SongPlayer
 from .async_loop import loop
 
@@ -15,4 +16,10 @@ class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         loop.submit_async(self.song_grid.show_playlist("bb052612-f834-4ff2-9937-e01351941b3d"))
+
+    @Gtk.Template.Callback()
+    def _on_window_close(self, window):
+        print("closed")
+        #TODO close player
+
 

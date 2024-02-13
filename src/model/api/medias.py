@@ -7,6 +7,15 @@ class Media:
             except KeyError:
                 pass
 
+class Album(Media):
+    keys = ["id", "parent", "isDir", "title", "name", "album", "artist", "year",
+            "genre", "coverArt", "duration", "created", "artistId", "songCount",
+            "isVideo", "bpm", "comment", "sortName", "mediaType", "musicBrainzId",
+            "genres", "replayGain"]
+
+    def __init__(self, response: dict):
+        super().__init__(response, Song.keys)
+
 class Song(Media):
     keys = ["id", "parent", "isDir", "title", "album", "artist", "track", "year",
             "coverArt", "size", "contentType", "suffix", "duration", "bitRate", "path",

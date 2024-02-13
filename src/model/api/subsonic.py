@@ -18,6 +18,13 @@ class Subsonic:
         self.username = username
         self.password = password
 
+    async def get_albums(self, offset: int = 0, size: int = 24,
+            ordering: str = "alphabeticalByName") -> list[Playlist]:
+
+        result = await self._request_json("getAlbumList",
+                {"type": ordering, "offset": offset, "size": size})
+        return [Album(album) for album in result["albumList"]["album"]]
+
     async def get_playlists(self) -> list[Playlist]:
         result = await self._request_json("getPlaylists")
         return [Playlist(playlist) for playlist in result["playlists"]["playlist"]]

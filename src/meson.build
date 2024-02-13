@@ -7,7 +7,8 @@ blueprints = custom_target('blueprints',
     'view/cover_thumbnail.blp',
     'view/song_grid.blp',
     'view/window.blp',
-    'view/song_player.blp'
+    'view/song_player.blp',
+    'view/album_view.blp'
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
@@ -46,6 +47,7 @@ periscope_sources = [
   'view/cover_thumbnail.py',
   'view/song_player.py',
   'view/cover_image.py',
+  'view/album_view.py',
   'model/config.py',
   'model/async_loop.py',
   'model/player.py',

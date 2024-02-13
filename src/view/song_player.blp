@@ -3,14 +3,14 @@ using Adw 1;
 using Pango 1.0;
 
 template $SongPlayer : Adw.Bin {
-  margin-top: 24;
-  margin-bottom: 24;
-  margin-start: 24;
-  margin-end: 24;
+  margin-top: 12;
+  margin-bottom: 12;
+  margin-start: 12;
+  margin-end: 12;
 
   Adw.BreakpointBin breakpoint_bin {
-    width-request: 304;
-    height-request: 96;
+    width-request: 316;
+    height-request: 86;
 
     Adw.Breakpoint {
         condition ("min-width: 600sp")
@@ -25,7 +25,7 @@ template $SongPlayer : Adw.Bin {
         condition ("max-width: 600sp")
 
         setters {
-          breakpoint_bin.height-request: 206;
+          breakpoint_bin.height-request: 194;
           vertical_box.spacing: 12;
           scale_above_bin.child: scale_clamp;
           thumbnail_above_bin.child: thumbnail;
@@ -62,7 +62,7 @@ template $SongPlayer : Adw.Bin {
             margin-end: 24;
 
             Button prev_button {
-              styles ["circular"]
+              styles ["circular", "flat"]
               valign: center;
               icon-name: "media-skip-backward-symbolic";
               sensitive: false;
@@ -81,7 +81,7 @@ template $SongPlayer : Adw.Bin {
             }
 
             Button next_button {
-              styles ["circular"]
+              styles ["circular", "flat"]
               valign: center;
               icon-name: "media-skip-forward-symbolic";
               sensitive: false;
@@ -97,16 +97,17 @@ template $SongPlayer : Adw.Bin {
         Box {
           spacing: 12;
           vexpand: true;
+          margin-end: 12;
 
           ToggleButton repeat_button {
-            styles ["circular"]
+            styles ["circular", "flat"]
             valign: center;
             icon-name: "media-playlist-repeat-symbolic";
             clicked => $_on_toggle_loop();
           }
 
           ToggleButton shuffle_button {
-            styles ["circular"]
+            styles ["circular", "flat"]
             valign: center;
             icon-name: "media-playlist-shuffle-symbolic";
             clicked => $_on_toggle_shuffle();
@@ -150,7 +151,7 @@ Box thumbnail {
 
 
   Image cover {
-    pixel-size: 96;
+    pixel-size: 84;
   }
 
   Box {
